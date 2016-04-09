@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Medicus Academicus</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_patient_name">Nume pacient</string>
+    <string name="prompt_password">Parola (CNP)</string>
+    <string name="button_sign_in_text" translatable="false">Autentificare</string>
+    <string name="error_invalid_password">Parola trebuie sa contina 13 cifre</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">Acest camp este obligatoriu</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+</resources>
