@@ -32,4 +32,9 @@ public class MenuActivity extends AppCompatActivity {
         MenuActivity.this.finish();
         startActivity(intent);
     }
+
+    public void goToPatientConditionActivity(View view) {
+        Intent intent = new Intent(this, PatientConditionActivity.class);
+        startActivity(intent);
+    }
 }

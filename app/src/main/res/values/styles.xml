@@ -6,11 +6,16 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+
     <style name="LoginFormTheme" parent="Theme.AppCompat.Light.Dialog">
         <item name="android:colorBackground">@color/whiteColor</item>
     </style>
+
     <style name="MenuTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:colorBackground">@color/whiteColor</item>
     </style>
 
+    <style name="PatientConditionTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:colorBackground">@color/whiteColor</item>
+    </style>
 </resources>

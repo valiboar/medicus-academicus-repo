@@ -32,26 +32,27 @@
             android:textSize="@dimen/welcome_message_dimens" />
 
         <Button
-            android:id="@+id/button_recommendations"
-            style="?android:textAppearanceSmall"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:layout_marginTop="45dp"
-            android:background="@drawable/buttonrecommendations"
-            android:text="@string/button_patient_recommendations"
-            android:textColor="@color/whiteColor"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <Button
             android:id="@+id/button_patient_condition"
             style="?android:textAppearanceSmall"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
+            android:layout_marginTop="45dp"
             android:background="@drawable/buttonpatientcondition"
             android:text="@string/button_patient_condition"
+            android:textColor="@color/whiteColor"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:onClick="goToPatientConditionActivity"/>
+
+        <Button
+            android:id="@+id/button_recommendations"
+            style="?android:textAppearanceSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="@drawable/buttonrecommendations"
+            android:text="@string/button_patient_recommendations"
             android:textColor="@color/whiteColor"
             android:textSize="20sp"
             android:textStyle="bold" />
