@@ -3,6 +3,7 @@ package ro.academicus.medicus.medicusacademicus1_0;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -48,8 +49,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * A dummy authentication store containing known user names and passwords.
      * TODO: remove after connecting to a real authentication system.
      */
+
+    public final static String EXTRA_PATIENT_NAME = "ro.academicus.medicus.medicusacademicus1_0.PATIENT_NAME";
+
     private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
+            "vali.boar@yahoo.com:1234567890123", "larisa.indries@yahoo.com:2345678901234"
     };
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -57,7 +61,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private UserLoginTask mAuthTask = null;
 
     // UI references.
-    private AutoCompleteTextView mPatientNameView;
+    private AutoCompleteTextView mPatientEmailView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
@@ -68,7 +72,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         // Set up the login form.
-        mPatientNameView = (AutoCompleteTextView) findViewById(R.id.patient_name_login);
+        mPatientEmailView = (AutoCompleteTextView) findViewById(R.id.patient_email_login);
         populateAutoComplete();
 
         mPasswordView = (EditText) findViewById(R.id.password);
@@ -113,7 +117,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             return true;
         }
         if (shouldShowRequestPermissionRationale(READ_CONTACTS)) {
-            Snackbar.make(mPatientNameView, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
+            Snackbar.make(mPatientEmailView, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
                     .setAction(android.R.string.ok, new View.OnClickListener() {
                         @Override
                         @TargetApi(Build.VERSION_CODES.M)
@@ -153,11 +157,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
 
         // Reset errors.
-        mPatientNameView.setError(null);
+        mPatientEmailView.setError(null);
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
-        String loginPatientName = mPatientNameView.getText().toString();
+        String loginPatientEmail = mPatientEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
 
         boolean cancel = false;
@@ -176,10 +180,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             cancel = true;
         }
 
-        // Check for a valid loginPatientName address.
-        if (TextUtils.isEmpty(loginPatientName)) {
-            mPatientNameView.setError(getString(R.string.error_field_required));
-            focusView = mPatientNameView;
+        // Check for a valid loginPatientEmail address.
+        if (TextUtils.isEmpty(loginPatientEmail)) {
+            mPatientEmailView.setError(getString(R.string.error_field_required));
+            focusView = mPatientEmailView;
+            cancel = true;
+        }
+
+        if (!TextUtils.isEmpty(loginPatientEmail) && !isEmailValid(loginPatientEmail)) {
+            mPatientEmailView.setError(getString(R.string.error_invalid_email));
+            focusView = mPatientEmailView;
             cancel = true;
         }
 
@@ -191,16 +201,17 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(loginPatientName, password);
+            mAuthTask = new UserLoginTask(loginPatientEmail, password);
             mAuthTask.execute((Void) null);
         }
     }
 
-    private boolean isPasswordValid(String password) {
-        if (TextUtils.isDigitsOnly(password) && password.length() == 13)
-            return true;
+    private boolean isEmailValid (String email) {
+        return email.contains("@");
+    }
 
-        return false;
+    private boolean isPasswordValid(String password) {
+        return (TextUtils.isDigitsOnly(password) && password.length() == 13);
     }
 
     /**
@@ -279,7 +290,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 new ArrayAdapter<>(LoginActivity.this,
                         android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
 
-        mPatientNameView.setAdapter(adapter);
+        mPatientEmailView.setAdapter(adapter);
     }
 
 
@@ -337,6 +348,18 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             if (success) {
                 finish();
+                Intent intent = new Intent(getBaseContext(), MenuActivity.class);
+                EditText editText = (EditText) findViewById(R.id.patient_email_login);
+                String email = "";
+                try {
+                     email = editText.getText().toString();
+                }
+                catch (NullPointerException ex) {
+                    ex.printStackTrace();
+                }
+                String patientName = email.substring(0, email.indexOf("@"));
+                intent.putExtra(EXTRA_PATIENT_NAME, patientName);
+                startActivity(intent);
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
