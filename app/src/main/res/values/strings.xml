@@ -9,9 +9,7 @@
     <string name="error_invalid_password">Parola trebuie să conțină 13 cifre</string>
     <string name="error_incorrect_password">Parola nu este corectă</string>
     <string name="error_field_required">Acest câmp este obligatoriu</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email
-        completions."
-    </string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email completions."</string>
 
     <!-- Strings related to menu -->
     <string name="button_patient_condition">Stare pacient</string>
@@ -23,4 +21,10 @@
     <string name="sign_out_dialog_message">Sunteți sigur că doriți să vă deconectați?</string>
     <string name="sign_out_dialog_pos_button">Da</string>
     <string name="sign_out_dialog_neg_button">Nu</string>
+
+    <!-- Strings related to patient condition -->
+    <string name="label_temperature">Temperatură:</string>
+    <string name="label_humidity">Umiditate:</string>
+    <string name="label_pulse">Puls:</string>
+    <string name="label_EKG">EKG:</string>
 </resources>
