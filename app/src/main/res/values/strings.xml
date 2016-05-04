@@ -18,4 +18,9 @@
     <string name="button_patient_recommendations">Recomandări medic</string>
     <string name="menu_welcome_message">Bine ați venit</string>
     <string name="button_sign_out_text">Deconectare</string>
+
+    <!-- Strings related to Sign Out alert dialog -->
+    <string name="sign_out_dialog_message">Sunteți sigur că doriți să vă deconectați?</string>
+    <string name="sign_out_dialog_pos_button">Da</string>
+    <string name="sign_out_dialog_neg_button">Nu</string>
 </resources>
