@@ -10,17 +10,23 @@ import android.view.View;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public class MenuActivity extends AppCompatActivity {
 
     private static String patientName; // folosit pt. memorarea numelui pacientului pentru refolosirea
                     // lui cand revenim in MenuActivity dintr-un Activity diferit de LoginActivity
+
+    public final static String EXTRA_RECOMMENDATIONS = "ro.academicus.medicus.medicusacademicus1_0.RECOMMENDATIONS";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
 
-        if (!PatientConditionActivity.intentFromPatient) {
+        if (!PatientConditionActivity.intentFromPatient && !CalendarActivity.intentFromCalendar) {
             Intent intent = getIntent();
             String patientName = intent.getStringExtra(LoginActivity.EXTRA_PATIENT_NAME);
 
@@ -33,8 +39,7 @@ public class MenuActivity extends AppCompatActivity {
 
             welcomeTextView.append(",\n" + patientName + "!");
             welcomeTextView.setTextSize(40);
-        }
-        else if (PatientConditionActivity.intentFromPatient) {
+        } else if (PatientConditionActivity.intentFromPatient) {
             TextView welcomeTextView = (TextView) findViewById(R.id.welcome_text_view);
 
             Typeface typeFace = Typeface.createFromAsset(getAssets(), "fonts/Montserrat-Bold.ttf");
@@ -44,6 +49,16 @@ public class MenuActivity extends AppCompatActivity {
             welcomeTextView.setTextSize(40);
 
             PatientConditionActivity.intentFromPatient = false;
+        } else if (CalendarActivity.intentFromCalendar) {
+            TextView welcomeTextView = (TextView) findViewById(R.id.welcome_text_view);
+
+            Typeface typeFace = Typeface.createFromAsset(getAssets(), "fonts/Montserrat-Bold.ttf");
+            welcomeTextView.setTypeface(typeFace);
+
+            welcomeTextView.append(",\n" + patientName + "!");
+            welcomeTextView.setTextSize(40);
+
+            CalendarActivity.intentFromCalendar = false;
         }
     }
 
@@ -79,6 +94,24 @@ public class MenuActivity extends AppCompatActivity {
         Intent intent = new Intent(this, PatientConditionActivity.class);
 
         intent.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+
+        startActivity(intent);
+    }
+
+    public void goToCalendarActivity(View view) {
+        Intent intent = new Intent(this, CalendarActivity.class);
+
+        intent.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+
+        HashMap<String, String[]> recommendations = new HashMap<>();
+
+        String[] recommendations5th = new String[] {"aleargă 30 min", "20 abdomene", "30 genoflexiuni"};
+        String[] recommendations6th = new String[] {"mers 60 min", "20 flotări"};
+
+        recommendations.put("5/5/2016", recommendations5th);
+        recommendations.put("6/5/2016", recommendations6th);
+
+        intent.putExtra(EXTRA_RECOMMENDATIONS, recommendations);
 
         startActivity(intent);
     }

@@ -27,15 +27,14 @@
 
         <activity
             android:name=".MenuActivity"
-            android:theme="@style/MenuTheme">
-
-        </activity>
+            android:theme="@style/MenuTheme" />
 
         <activity
             android:name=".PatientConditionActivity"
-            android:theme="@style/PatientConditionTheme">
+            android:theme="@style/PatientConditionTheme" />
 
-        </activity>
+        <activity android:name=".CalendarActivity"
+            android:theme="@style/PatientConditionTheme" />
     </application>
 
 </manifest>

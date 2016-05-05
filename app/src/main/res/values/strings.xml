@@ -27,4 +27,10 @@
     <string name="label_humidity">Umiditate:</string>
     <string name="label_pulse">Puls:</string>
     <string name="label_EKG">EKG:</string>
+
+    <string name="back_butt_content_text">Înapoi</string>
+
+    <!-- Strings related to calendar -->
+    <string name="recommendations_popup_title">Recomandări</string>
+    <string name="recommendations_popup_pos_button">OK</string>
 </resources>
