@@ -14,21 +14,21 @@
         android:layout_height="50dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:src="@drawable/ic_back_icon"
-        android:onClick="backToMenu"/>
+        android:onClick="backToMenu"
+        android:src="@drawable/ic_back_icon" />
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@mipmap/ic_launcher"
-        android:layout_alignParentEnd="true"/>
+        android:layout_alignParentEnd="true"
+        android:src="@mipmap/ic_launcher" />
 
     <GridLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="125dp"
         android:orientation="vertical"
-        android:rowCount="4">
+        android:rowCount="5">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -48,12 +48,13 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/txt_temp"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@drawable/border"
                 android:textAlignment="center"
-                android:textColor="@color/blackColor"
+                android:textColor="@color/colorPrimary"
                 android:textSize="30sp"
                 android:textStyle="bold" />
 
@@ -77,12 +78,13 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/txt_pulse"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@drawable/border"
                 android:textAlignment="center"
-                android:textColor="@color/blackColor"
+                android:textColor="@color/colorPrimary"
                 android:textSize="30sp"
                 android:textStyle="bold" />
 
@@ -106,12 +108,13 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/txt_humidity"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@drawable/border"
                 android:textAlignment="center"
-                android:textColor="@color/blackColor"
+                android:textColor="@color/colorPrimary"
                 android:textSize="30sp"
                 android:textStyle="bold" />
 
@@ -126,22 +129,21 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1.5"
+                android:layout_weight="0.5"
                 android:text="@string/label_EKG"
                 android:textAlignment="center"
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="30sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:layout_gravity="center"/>
 
-            <TextView
+            <com.jjoe64.graphview.GraphView
+                android:id="@+id/ecg_graph"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/border"
-                android:textAlignment="center"
-                android:textColor="@color/blackColor"
-                android:textSize="30sp"
-                android:textStyle="bold" />
+                android:layout_height="110dip"
+                android:layout_weight="2"
+                android:layout_gravity="center"
+                android:background="@color/colorPrimaryDark" />
 
         </LinearLayout>
 
