@@ -58,7 +58,7 @@ public class AccelerometerService extends Service implements SensorEventListener
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Toast.makeText(this, "Accelerometrul a fost dezactivat!", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Accelerometrul  a fost dezactivat!", Toast.LENGTH_LONG).show();
         accTimer.cancel();
     }
 
