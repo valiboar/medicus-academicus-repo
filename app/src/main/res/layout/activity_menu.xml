@@ -14,14 +14,31 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <Button
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="top|end"
-            android:onClick="signOut"
-            android:background="@color/whiteColor"
-            android:text="@string/button_sign_out_text" />
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/startAccButton"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_column="0"
+                android:layout_gravity=""
+                android:onClick="startAccService"
+                android:text="@string/button_start_acc" />
+
+            <Button
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_column="1"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="top|end"
+                android:onClick="signOut"
+                android:background="@color/whiteColor"
+                android:text="@string/button_sign_out_text" />
+
+        </GridLayout>
 
         <TextView
             android:id="@+id/welcome_text_view"

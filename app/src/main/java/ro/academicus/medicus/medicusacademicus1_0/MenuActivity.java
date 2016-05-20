@@ -7,11 +7,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -70,6 +72,28 @@ public class MenuActivity extends AppCompatActivity {
         }
     }
 
+    // Method to start the service
+    public void startAccService(View view) {
+        Button startAccButton = (Button) findViewById(R.id.startAccButton);
+        startAccButton.setText("Accelerometrul e pornit!");
+        startAccButton.setEnabled(false);
+
+        Snackbar.make(view, "Accelerometrul a fost activat!", Snackbar.LENGTH_INDEFINITE)
+                .setAction("Închide", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                    }
+                })
+                .show();
+        startService(new Intent(getBaseContext(), AccelerometerService.class));
+    }
+
+    // Method to stop the service
+    public void stopAccService(View view) {
+        stopService(new Intent(getBaseContext(), AccelerometerService.class));
+    }
+
     public void signOut(final View view) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MenuActivity.this);    //sau view.getContext();
         alertDialogBuilder.setMessage(R.string.sign_out_dialog_message)
@@ -84,6 +108,8 @@ public class MenuActivity extends AppCompatActivity {
                         MenuActivity.this.finish();
 
                         startActivity(intent);
+
+                        stopAccService(view);
                     }
                 })
                 .setNegativeButton(R.string.sign_out_dialog_neg_button, new DialogInterface.OnClickListener() {
