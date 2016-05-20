@@ -1,5 +1,9 @@
 package ro.academicus.medicus.medicusacademicus1_0;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -7,8 +11,10 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -20,6 +26,8 @@ public class MenuActivity extends AppCompatActivity {
                     // lui cand revenim in MenuActivity dintr-un Activity diferit de LoginActivity
 
     public final static String EXTRA_RECOMMENDATIONS = "ro.academicus.medicus.medicusacademicus1_0.RECOMMENDATIONS";
+
+    private final static int REQUEST_ENABLE_BT = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,8 +80,8 @@ public class MenuActivity extends AppCompatActivity {
                         Intent intent = new Intent(view.getContext(), LoginActivity.class); // view accesed from an inner class (needs to be final)
                         // putem avea getBaseContext() sau getApplicationContext() in loc de view.getContext()?
 
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        //MenuActivity.this.finish();
+                        //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        MenuActivity.this.finish();
 
                         startActivity(intent);
                     }
@@ -91,11 +99,29 @@ public class MenuActivity extends AppCompatActivity {
     }
 
     public void goToPatientConditionActivity(View view) {
-        Intent intent = new Intent(this, PatientConditionActivity.class);
 
-        intent.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        startActivity(intent);
+        String status = "";
+
+        if (bluetoothAdapter != null) {
+
+            if (!bluetoothAdapter.isEnabled()) {
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+
+                bluetoothAdapter.startDiscovery();
+
+                Intent intent = new Intent(this, BluetoothActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+                startActivity(intent);
+            }
+        }
+
+        else {
+            status = "Your device does not support Bluetooth!";
+            Toast.makeText(this, status, Toast.LENGTH_LONG).show();
+        }
     }
 
     public void goToCalendarActivity(View view) {
