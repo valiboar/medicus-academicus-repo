@@ -14,6 +14,7 @@ import android.telephony.TelephonyManager;
 import android.text.Html;
 import android.util.Xml;
 import android.view.View;
+import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,6 +59,17 @@ public class PatientConditionActivity extends AppCompatActivity {
     private final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
     private BluetoothSocket bluetoothSocket = null;
+
+    // private String receivedEkg = "";
+
+
+    private MediaController ref;
+
+    private TextView txtViewTemp;
+    private TextView txtViewUmiditate;
+    private TextView txtViewPuls;
+
+    private GraphView graph;
 
     public ArrayList<String> getDevices() {
         mPairedDevicesArrayAdapter = new ArrayList<String>();
@@ -138,21 +150,54 @@ public class PatientConditionActivity extends AppCompatActivity {
         }
 
 
+        private double graph2LastXValue = 5d;
+        private int i = 0;
+
+        private void UpdateValues(String temp, String umiditate, String puls, String ekg) {
+            Runnable mTimer2;
+
+            //txtViewTemp.setText(temp + "<sup><small>◦</small></sup>C");
+            //txtViewPuls.setText(puls);
+            //txtViewUmiditate.setText(umiditate);
+
+            final String[] EkgSplit = ekg.split("-");
+
+            final ArrayList<Double> ekgtest = new ArrayList<>();
+
+            for (double i = 0; i < 29; i++) {
+                ekgtest.add(i);
+            }
+
+            mTimer2 = new Runnable() {
+                @Override
+                public void run() {
+                    graph2LastXValue += 1d;
+                    mSeries1.appendData(new DataPoint(graph2LastXValue, ekgtest.get(i)), true, 40);
+                    i++;
+                    mHandler.postDelayed(this, 200);
+                }
+            };
+
+            mHandler.postDelayed(mTimer2, 1000);
+        }
+
         @Override
         public void run() {
             byte[] buffer = new byte[100];
 
-            ReceivedState receivedState = ReceivedState.CITIRE_TAG_PULS;
-
-            ArrayList<String> values = new ArrayList<>();
+            //ReceivedState receivedState = ReceivedState.CITIRE_TAG_PULS;
 
             while (true) {
                 try {
+                    UpdateValues("", "", "", "");
                     while (mmInStream.read(buffer, 0, buffer.length) != -1) {
-
                         String received = "";
+                        received = new String(buffer);
+                        String[] receivedSplit = received.split(";");
 
-                        switch (receivedState) {
+                        UpdateValues(receivedSplit[1], receivedSplit[3], receivedSplit[5], receivedSplit[7]);
+
+                       /* switch (receivedState) {
                             case CITIRE_TAG_PULS:
                                 received = new String(buffer);
                                 received = received.replaceAll("\0", "");
@@ -229,12 +274,12 @@ public class PatientConditionActivity extends AppCompatActivity {
                                 receivedState = ReceivedState.CITIRE_TAG_PULS;
 
                                 break;
-                        }
+                        }*/
 
                     }
 
-                    CharSequence[] charSequences = values.toArray(new CharSequence[values.size()]);
-                    Toast.makeText(getBaseContext(), Arrays.toString(charSequences), Toast.LENGTH_LONG).show();
+                    // CharSequence[] charSequences = values.toArray(new CharSequence[values.size()]);
+                    //Toast.makeText(getBaseContext(), Arrays.toString(charSequences), Toast.LENGTH_LONG).show();
                 } catch (IOException IOex) {
                     IOex.printStackTrace();
                 }
@@ -254,7 +299,6 @@ public class PatientConditionActivity extends AppCompatActivity {
         }
     }
 
-
     private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException {
         //TelephonyManager tManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         //String uuidString = tManager.getDeviceId();
@@ -270,14 +314,18 @@ public class PatientConditionActivity extends AppCompatActivity {
         }
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_patient_condition);
         intentFromPatient = false;
 
-        GraphView graph = (GraphView) findViewById(R.id.ecg_graph);
+        graph = (GraphView) findViewById(R.id.ecg_graph);
+
+        txtViewTemp = (TextView) findViewById(R.id.txt_temp);
+        txtViewUmiditate = (TextView) findViewById(R.id.txt_humidity);
+        txtViewPuls = (TextView) findViewById(R.id.txt_pulse);
+
         /*LineGraphSeries<DataPoint> series = new LineGraphSeries<>(new DataPoint[]{
                 new DataPoint(0, 1),
                 new DataPoint(1, 5),
@@ -286,21 +334,13 @@ public class PatientConditionActivity extends AppCompatActivity {
                 new DataPoint(4, 6)
         });*/
 
-        mSeries1 = new LineGraphSeries<>(generateData());
+        mSeries1 = new LineGraphSeries<>();
         graph.addSeries(mSeries1);
         graph.getViewport().setXAxisBoundsManual(true);
         graph.getViewport().setMinX(0);
         graph.getViewport().setMaxX(30);
         graph.setBackgroundColor(Color.parseColor("#FFFFFF"));
         graph.setDrawingCacheBackgroundColor(Color.rgb(255, 64, 129));
-
-        TextView txtTemp = (TextView) findViewById(R.id.txt_temp);
-        TextView txtPulse = (TextView) findViewById(R.id.txt_pulse);
-        TextView txtHumidity = (TextView) findViewById(R.id.txt_humidity);
-
-        txtTemp.setText(Html.fromHtml("30.5<sup><small>◦</small></sup>C"));
-        txtPulse.setText("80");
-        txtHumidity.setText("50.6");
     }
 
     public void backToMenu(View view) {
@@ -322,20 +362,20 @@ public class PatientConditionActivity extends AppCompatActivity {
         startActivity(new Intent(this, MenuActivity.class));
     }*/
 
-    Random mRand = new Random();
+    //Random mRand = new Random();
 
-    private DataPoint[] generateData() {
-        int count = 30;
-        DataPoint[] values = new DataPoint[count];
-        for (int i = 0; i < count; i++) {
-            double x = i;
-            double f = mRand.nextDouble() * 0.15 + 0.3;
-            double y = Math.sin(i * f + 2) + mRand.nextDouble() * 0.3;
-            DataPoint v = new DataPoint(x, y);
-            values[i] = v;
-        }
-        return values;
-    }
+//    private DataPoint[] generateData() {
+//        int count = 30;
+//        DataPoint[] values = new DataPoint[count];
+//        for (int i = 0; i < count; i++) {
+//            double x = i;
+//            double f = mRand.nextDouble() * 0.15 + 0.3;
+//            double y = Math.sin(i * f + 2) + mRand.nextDouble() * 0.3;
+//            DataPoint v = new DataPoint(x, y);
+//            values[i] = v;
+//        }
+//        return values;
+//    }
 
     private boolean connected = false;
 
@@ -346,7 +386,7 @@ public class PatientConditionActivity extends AppCompatActivity {
         mTimer1 = new Runnable() {
             @Override
             public void run() {
-                mSeries1.resetData(generateData());
+                //mSeries1.resetData(generateData());
                 mHandler.postDelayed(this, 300);
 
                 if (!connected) {
