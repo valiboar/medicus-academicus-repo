@@ -20,8 +20,14 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.text.Editable;
+import android.text.InputType;
 import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
+import android.view.TouchDelegate;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
@@ -30,7 +36,9 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,25 +56,32 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private static final int REQUEST_READ_CONTACTS = 0;
 
     /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
+     * Extra for the patient name (for starting the MenuActivity).
      */
-
     public final static String EXTRA_PATIENT_NAME = "ro.academicus.medicus.medicusacademicus1_0.PATIENT_NAME";
 
+    /**
+     * A dummy authentication store containing known user names and passwords.
+     */
     private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "vali.boar@yahoo.com:1234567890123", "larisa.indries@yahoo.com:2345678901234"
+            "vali.boar@yahoo.com:1234567890123",
+            "larisa.indries@yahoo.com:2345678901234",
+            "a@:123"
     };
+
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginTask mAuthTask = null;
 
-    // UI references.
+    /**
+     * UI references.
+     */
     private AutoCompleteTextView mPatientEmailView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+    private View mPasswordVisibilityView;
 
 
     @Override
@@ -76,34 +91,122 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         // Set up the login form.
         mPatientEmailView = (AutoCompleteTextView) findViewById(R.id.patient_email_login);
-        /*InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(mPatientEmailView, InputMethodManager.SHOW_IMPLICIT);*/
-        populateAutoComplete();
+        mPatientEmailView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                if (i == EditorInfo.IME_ACTION_NEXT) {
+                    if (!mPasswordView.getText().toString().equals("")) {
+                        View currentFocusedView = getCurrentFocus();
+
+                        if (currentFocusedView != null) {
+                            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                            imm.hideSoftInputFromWindow(currentFocusedView.getWindowToken(),
+                                    InputMethodManager.HIDE_IMPLICIT_ONLY);
+                        }
+
+                        mPasswordVisibilityView.setVisibility(View.INVISIBLE);
+
+                        attemptLogin();
+
+                        return true;
+                    }
+
+                    return false;
+                }
+
+                return false;
+            }
+        });
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    View currentFocusedView = getCurrentFocus();
+
+                    if (currentFocusedView != null) {
+                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(currentFocusedView.getWindowToken(),
+                                InputMethodManager.HIDE_IMPLICIT_ONLY);
+                    }
+
+                    mPasswordVisibilityView.setVisibility(View.INVISIBLE);
+
                     attemptLogin();
+
                     return true;
                 }
                 return false;
             }
         });
 
-        Button mSignInButton = (Button) findViewById(R.id.sign_in_button);
-        mSignInButton.setOnClickListener(new OnClickListener() {
+        mPasswordVisibilityView = findViewById(R.id.showPasswordIcon);
+        if (mPasswordVisibilityView != null) {
+            mPasswordVisibilityView.setOnTouchListener(mPasswordVisibleTouchListener);
+            mPasswordVisibilityView.setVisibility(View.INVISIBLE);
+        }
+
+        mPasswordView.setInputType(InputType.TYPE_CLASS_NUMBER |
+                InputType.TYPE_NUMBER_VARIATION_PASSWORD);
+
+        mPasswordView.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onClick(View view) {
-                attemptLogin();
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                mPasswordVisibilityView.setVisibility(editable.length() > 0 ? View.VISIBLE : View.GONE);
             }
         });
 
+        Button mSignInButton = (Button) findViewById(R.id.sign_in_button);
+        if (mSignInButton != null) {
+            mSignInButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    attemptLogin();
+                    mPasswordVisibilityView.setVisibility(View.INVISIBLE);
+                }
+            });
+        }
+
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
-    }
 
+        populateAutoComplete();
+
+    } // end of onCreate()
+
+
+    private View.OnTouchListener mPasswordVisibleTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            final boolean isOutsideView = motionEvent.getX() < 0 ||
+                    motionEvent.getX() > view.getWidth() ||
+                    motionEvent.getY() < 0 ||
+                    motionEvent.getY() > view.getHeight();
+
+            // change input type will reset cursor position, so we want to save it
+            final int cursor = mPasswordView.getSelectionStart();
+
+            if (isOutsideView || MotionEvent.ACTION_UP == motionEvent.getAction())
+                mPasswordView.setInputType(InputType.TYPE_CLASS_NUMBER |
+                        InputType.TYPE_NUMBER_VARIATION_PASSWORD);
+            else
+                mPasswordView.setInputType(InputType.TYPE_CLASS_NUMBER);
+
+            mPasswordView.setSelection(cursor);
+            return true;
+        }
+    };
 
     private void populateAutoComplete() {
         if (!mayRequestContacts()) {
@@ -211,13 +314,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
-    private boolean isEmailValid (String email) {
+    private boolean isEmailValid(String email) {
         return email.contains("@");
     }
 
     private boolean isPasswordValid(String password) {
-        return (TextUtils.isDigitsOnly(password) && password.length() == 13);
+        return (TextUtils.isDigitsOnly(password) /*&& password.length() == 13*/);
     }
+
 
     /**
      * Shows the progress UI and hides the login form.
@@ -255,6 +359,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
+
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         return new CursorLoader(this,
@@ -272,6 +377,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 ContactsContract.Contacts.Data.IS_PRIMARY + " DESC");
     }
 
+
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         List<String> emails = new ArrayList<>();
@@ -284,10 +390,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         addEmailsToAutoComplete(emails);
     }
 
+
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
 
     }
+
 
     private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
         //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
@@ -308,6 +416,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         int ADDRESS = 0;
         int IS_PRIMARY = 1;
     }
+
 
     /**
      * Represents an asynchronous login/registration task used to authenticate
@@ -342,8 +451,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 }
             }
 
-            // TODO: register the new account here.
-            return true;
+            return false;
         }
 
         @Override
@@ -358,17 +466,19 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 EditText editText = (EditText) findViewById(R.id.patient_email_login);
                 String email = "";
                 try {
-                     email = editText.getText().toString();
-                }
-                catch (NullPointerException ex) {
+                    email = editText.getText().toString();
+                } catch (NullPointerException ex) {
                     ex.printStackTrace();
                 }
                 String patientName = email.substring(0, email.indexOf("@"));
                 intent.putExtra(EXTRA_PATIENT_NAME, patientName);
                 startActivity(intent);
             } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
+                Toast incorrectDataToast = Toast.makeText(getBaseContext(), R.string.error_incorrect_login_data, Toast.LENGTH_LONG);
+                incorrectDataToast.setGravity(Gravity.CENTER, 0, 0);
+                incorrectDataToast.show();
+                //mPasswordView.setError(getString(R.string.error_incorrect_login_data));
+                //mPasswordView.requestFocus();
             }
         }
 

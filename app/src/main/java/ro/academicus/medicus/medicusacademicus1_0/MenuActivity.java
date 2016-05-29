@@ -128,25 +128,28 @@ public class MenuActivity extends AppCompatActivity {
 
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        String status = "";
-
         if (bluetoothAdapter != null) {
-
             if (!bluetoothAdapter.isEnabled()) {
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            } else {
+                onActivityResult(REQUEST_ENABLE_BT, RESULT_OK, null);
+            }
+        } else {
+            String status = "";
+            status = "Your device does not support Bluetooth!";
+            Toast.makeText(this, status, Toast.LENGTH_LONG).show();
+        }
+    }
 
-                bluetoothAdapter.startDiscovery();
-
-                Intent intent = new Intent(this, BluetoothActivity.class);
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == REQUEST_ENABLE_BT) {
+            if (resultCode == RESULT_OK) {
+                Intent intent = new Intent(this, PatientConditionActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
                 startActivity(intent);
             }
-        }
-
-        else {
-            status = "Your device does not support Bluetooth!";
-            Toast.makeText(this, status, Toast.LENGTH_LONG).show();
         }
     }
 

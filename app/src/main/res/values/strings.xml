@@ -7,7 +7,7 @@
     <string name="button_sign_in_text">Autentificare</string>
     <string name="error_invalid_email">Introduceți un e-mail valid</string>
     <string name="error_invalid_password">Parola trebuie să conțină 13 cifre</string>
-    <string name="error_incorrect_password">Parola nu este corectă</string>
+    <string name="error_incorrect_login_data">Datele tale nu sunt corecte</string>
     <string name="error_field_required">Acest câmp este obligatoriu</string>
     <string name="permission_rationale">"Contacts permissions are needed for providing email completions."</string>
 
